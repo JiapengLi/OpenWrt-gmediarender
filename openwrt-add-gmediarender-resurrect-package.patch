@@ -1,0 +1,80 @@
+commit f1197142d0d4e6df35832ab2847ffa06030f2693
+Author: JiapengLi <gapleehit@gmail.com>
+Date:   Fri Dec 6 13:26:56 2013 +0800
+
+    Add gmediarender-resurrect to OpenWrt
+
+diff --git a/multimedia/gmediarender/Makefile b/multimedia/gmediarender/Makefile
+new file mode 100644
+index 0000000..696730e
+--- /dev/null
++++ b/multimedia/gmediarender/Makefile
+@@ -0,0 +1,51 @@
++#
++# Copyright (C) 2013 OpenWrt.org
++#
++# This is free software, licensed under the GNU General Public License v2.
++# See /LICENSE for more information.
++#
++
++include $(TOPDIR)/rules.mk
++
++PKG_NAME:=gmediarender
++PKG_VERSION:=2013-12-04
++PKG_RELEASE=$(PKG_SOURCE_VERSION)
++
++PKG_SOURCE_PROTO:=git
++PKG_SOURCE_URL:=git@github.com:hzeller/gmrender-resurrect.git
++PKG_SOURCE_SUBDIR:=$(PKG_NAME)-$(PKG_VERSION)
++PKG_SOURCE_VERSION:=e2eb7852eebea95c69c79c43a1e4d5f52409930f
++PKG_SOURCE:=$(PKG_NAME)-$(PKG_VERSION)-$(PKG_SOURCE_VERSION).tar.gz
++
++PKG_FIXUP:=autoreconf
++PKG_INSTALL=1
++PKG_REMOVE_FILES:=autogen.sh aclocal.m4
++
++include $(INCLUDE_DIR)/package.mk
++include $(INCLUDE_DIR)/nls.mk
++
++define Package/gmediarender
++  SECTION:=multimedia
++  CATEGORY:=Multimedia
++  DEPENDS:= +gstreamer +glib2 +libupnp
++  TITLE:=A Headless UPnP Renderer
++endef
++
++define Package/gmediarender/description
++  gmediarender implements the server component that provides UPnP
++  controllers a means to render media content (audio, video and images)
++  from a UPnP media server.
++endef
++
++CONFIGURE_ARGS+= \
++	--with-build-cc="$(HOSTCC)" \
++	--prefix="\usr"
++
++define Package/gmediarender/install
++	$(INSTALL_DIR) $(1)/usr/sbin
++	$(INSTALL_BIN) $(PKG_INSTALL_DIR)/usr/bin/$(PKG_NAME) $(1)/usr/sbin/
++	$(INSTALL_DIR) $(1)/etc/init.d
++	$(CP) 		   $(PKG_BUILD_DIR)/scripts/init.d/$(PKG_NAME)er $(1)/etc/init.d/$(PKG_NAME)
++endef
++
++$(eval $(call BuildPackage,gmediarender))
+diff --git a/multimedia/gmediarender/patches/000-add-std-c99-option.patch b/multimedia/gmediarender/patches/000-add-std-c99-option.patch
+new file mode 100644
+index 0000000..75a0237
+--- /dev/null
++++ b/multimedia/gmediarender/patches/000-add-std-c99-option.patch
+@@ -0,0 +1,11 @@
++--- a/configure.ac
+++++ b/configure.ac
++@@ -20,7 +20,7 @@ EXTRA_GCC_DEBUG_CXXFLAGS=""
++ if test -n "$GCC"; then
++    EXTRA_GCC_DEBUG_CFLAGS="$CFLAGS"
++    EXTRA_GCC_DEBUG_CXXFLAGS="$CXXFLAGS"
++-   CFLAGS="-Wall -Wpointer-arith -Wmissing-prototypes -Wmissing-declarations -Wwrite-strings"
+++   CFLAGS="-Wall -Wpointer-arith -Wmissing-prototypes -Wmissing-declarations -Wwrite-strings -std=c99"
++    CXXFLAGS="-Wall -Wpointer-arith"
++ fi  
++ 
